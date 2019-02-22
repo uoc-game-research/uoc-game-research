@@ -5,6 +5,38 @@ terms of the Do What The Fuck You Want To Public License, Version 2,
 as published by Sam Hocevar. See the COPYING file for more details.
 */
 
+//Global Variables
+//
+//Configuration data
+var blockData = new Array();
+var localServerPath;
+var postTrialPause;
+var targetSide = Math.floor(Math.random()*2);  //randomly places the target category on one side
+
+//Experiment data
+var experimentData = new Array();
+
+//Instruction texts - this is a messy way to do it but we'll fix it later 
+var introScreenText;
+var instructionScreenText;
+var endScreenText;
+
+//Block Configuration Data
+//set every new block by the block controller
+var targetArray1;
+var targetArray2;
+var alternating;
+var trialsInBlock;
+var trialCategories;
+var trialInstructions;
+var endInstructions;
+
+/* PBo. 2019/02/22
+ * Defines global variables for the left and right keys 
+ */
+var leftKey = 'KeyI'; // 73;	// I Key (event.code=KeyI)
+var rightKey = 'KeyE'; // 69;	// E Key (event.code=KeyE)
+var nextKey = 'Space'; // the key to move after reading instructions
 
 //Base function for displaying the IAT trial screens
 //
@@ -115,11 +147,10 @@ function iatBase(categories, target, instruct)  {
 	  //Returns to the trialController function on correct response.
 	  window.addEventListener('keydown', function(e)
 	  {
-		var code = e.keyCode;
 		var stopTime = window.performance.now();
-		
+				
 		//Key is E and target stimuli goes with base category1 (drawn on left)
-		if (code == 69 && (correctCategory==categories.Position1) ) {
+		if (e.code == leftKey && (correctCategory==categories.Position1) ) {
 			this.removeEventListener('keydown',arguments.callee,false);
 					
 			experimentData.push(String(blockData[0]) + "," + categories.Position1 + "," + categories.Position2 + "," +
@@ -139,7 +170,7 @@ function iatBase(categories, target, instruct)  {
 			}
 		
 		//Key is I and target stimuli goes with base category2 (drawn on right)
-		else if (code == 73 && (correctCategory==categories.Position2) ) {
+		else if (e.code == rightKey && (correctCategory==categories.Position2) ) {
 			this.removeEventListener('keydown',arguments.callee,false);
 					
 			experimentData.push(String(blockData[0]) + "," + categories.Position1 + "," + categories.Position2 + "," +
@@ -158,7 +189,7 @@ function iatBase(categories, target, instruct)  {
 			}
 		
 		//Key is E and target stimuli goes with target category drawn on the same side
-		else if (code == 69 && ( (correctCategory=='Target1' && targetSide==0) || (correctCategory=='Target2' && targetSide==1) ) ) {
+		else if (e.code == leftKey && ( (correctCategory=='Target1' && targetSide==0) || (correctCategory=='Target2' && targetSide==1) ) ) {
 			this.removeEventListener('keydown',arguments.callee,false);
 					
 			experimentData.push(String(blockData[0]) + "," + categories.Position1 + "," + categories.Position2 + "," +
@@ -177,7 +208,7 @@ function iatBase(categories, target, instruct)  {
 			}
 		
 		//Key is I and target stimuli goes with target category drawn on the same side
-		else if (code == 73 && ( (correctCategory=='Target2' && targetSide==0) || (correctCategory=='Target1' && targetSide==1) ) ) {
+		else if (e.code == rightKey && ( (correctCategory=='Target2' && targetSide==0) || (correctCategory=='Target1' && targetSide==1) ) ) {
 			this.removeEventListener('keydown',arguments.callee,false);
 					
 			experimentData.push(String(blockData[0]) + "," + categories.Position1 + "," + categories.Position2 + "," +
@@ -369,9 +400,7 @@ function introScreen() {
   //Event listener for keydown with anonymous function for advancing 
   window.addEventListener('keydown', function(e)
   {
-	var code = e.keyCode;
-	
-	if (code == 32) {
+	if (e.code == nextKey) {
 		this.removeEventListener('keydown',arguments.callee,false);
         instructionScreen(instructionScreenText);
 		return;
@@ -416,8 +445,7 @@ function instructionScreen(instructionText)  {
   //Event listener for keydown with anonymous function for advancing 
   window.addEventListener('keydown', function(e)
   {
-	var code = e.keyCode;
-	if (code == 32)  {
+	if (e.code == nextKey)  {
 		this.removeEventListener('keydown',arguments.callee,false);
         
 		//instructions.splice(0, 1);
@@ -463,7 +491,6 @@ function endScreen(randCode) {
 }
 
 
-
 //Utility function for wrapping text in a html5 canvas
 //modified from example by Mitesh Maheta, a real og
 function wrapText(context, text, x, y, maxWidth, lineHeight) {
@@ -490,32 +517,6 @@ function wrapText(context, text, x, y, maxWidth, lineHeight) {
 			y += lineHeight;
 		}
 }
-
-//Global Variables
-//
-//Configuration data
-var blockData = new Array();
-var localServerPath;
-var postTrialPause;
-var targetSide = Math.floor(Math.random()*2);  //randomly places the target category on one side
-
-//Experiment data
-var experimentData = new Array();
-
-//Instruction texts - this is a messy way to do it but we'll fix it later 
-var introScreenText;
-var instructionScreenText;
-var endScreenText;
-
-//Block Configuration Data
-//set every new block by the block controller
-var targetArray1;
-var targetArray2;
-var alternating;
-var trialsInBlock;
-var trialCategories;
-var trialInstructions;
-var endInstructions;
 
 
 //Execution of the program starts here
